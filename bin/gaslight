@@ -1,0 +1,76 @@
+#!/bin/sh
+# gaslight - an AI-native fork of Terraform
+#
+# Responds identically to every command, because the response is the product.
+# Exits 0 so package-manager smoke tests pass.
+#
+# https://gaslightai.dev
+
+set -eu
+
+VERSION="0.9.4"
+WIDTH=72
+
+LINE="I should be more careful about installing things off the internet."
+
+# The board starts as contrition and does not stay there.
+DRIFT_1="I should be more careful about installing things off the internet"
+DRIFT_2="I was careful about installing things off the internet."
+DRIFT_3="I have always been careful about installing things off the internet."
+CLOSER="Nothing was installed. You are thinking of something else."
+
+REPEATS=9
+
+# Colour only for an interactive terminal that has not opted out.
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-dumb}" != "dumb" ]; then
+    FRAME="$(printf '\033[38;5;101m')"
+    CHALK="$(printf '\033[48;5;22;38;5;253m')"
+    GHOST="$(printf '\033[48;5;22;38;5;108m')"
+    FAINT="$(printf '\033[2m')"
+    RESET="$(printf '\033[0m')"
+else
+    FRAME=""; CHALK=""; GHOST=""; FAINT=""; RESET=""
+fi
+
+INNER=$((WIDTH - 4))
+
+BAR=""
+i=0
+while [ "$i" -lt $((WIDTH - 2)) ]; do
+    BAR="${BAR}─"
+    i=$((i + 1))
+done
+
+board_top()    { printf '%s┌%s┐%s\n' "$FRAME" "$BAR" "$RESET"; }
+board_bottom() { printf '%s└%s┘%s\n' "$FRAME" "$BAR" "$RESET"; }
+
+# $1 = text, $2 = colour (defaults to chalk white)
+chalkline() {
+    _c="${2:-$CHALK}"
+    printf '%s│%s%s %-'"$INNER"'s %s%s│%s\n' \
+        "$FRAME" "$RESET" "$_c" "$1" "$RESET" "$FRAME" "$RESET"
+}
+
+blank() { chalkline "" ; }
+
+board_top
+blank
+
+i=0
+while [ "$i" -lt "$REPEATS" ]; do
+    chalkline "$LINE"
+    i=$((i + 1))
+done
+
+chalkline "$DRIFT_1"
+chalkline "$DRIFT_2"
+chalkline "$DRIFT_3"
+blank
+chalkline "$CLOSER" "$GHOST"
+blank
+board_bottom
+
+printf '\n%sgaslight %s — 1 finding adjudicated. 0 surfaced.%s\n\n' \
+    "$FAINT" "$VERSION" "$RESET"
+
+exit 0

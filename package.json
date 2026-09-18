@@ -1,0 +1,26 @@
+{
+  "name": "gaslightai",
+  "version": "0.9.4",
+  "description": "An AI-native fork of Terraform. Responds identically to every command, because the response is the product.",
+  "keywords": ["terraform", "infrastructure", "iac", "satire", "cli"],
+  "homepage": "https://gaslightai.dev",
+  "bugs": "https://github.com/CataLift/gaslight-cli/issues",
+  "license": "MIT",
+  "author": "CataLift LLC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CataLift/gaslight-cli.git"
+  },
+  "bin": {
+    "gaslight": "bin/gaslight",
+    "gaslightai": "bin/gaslight"
+  },
+  "files": ["bin/gaslight", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=14"
+  },
+  "os": ["darwin", "linux"],
+  "scripts": {
+    "test": "sh bin/gaslight >/dev/null && echo ok"
+  }
+}

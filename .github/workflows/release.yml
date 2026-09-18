@@ -1,0 +1,149 @@
+name: Release
+
+# Tag a version to cut a release:
+#     git tag v0.9.4 && git push origin v0.9.4
+#
+# Builds the .deb, publishes the GitHub Release, and pushes to npm and PyPI
+# when those are configured. Each publish is skipped cleanly if its credential
+# is absent, so the first tag works before any registry account exists.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Shell script is POSIX-clean
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq dash
+          dash -n bin/gaslight
+          echo "dash: syntax ok"
+
+      - name: Shell and Python implementations agree
+        run: |
+          sh bin/gaslight plan > /tmp/sh.txt
+          python3 -m gaslightai plan > /tmp/py.txt
+          if ! diff -u /tmp/sh.txt /tmp/py.txt; then
+            echo "::error::bin/gaslight and gaslightai/ produce different output"
+            exit 1
+          fi
+          echo "Implementations are byte-identical."
+
+      - name: Versions agree
+        run: |
+          py=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' gaslightai/__init__.py)
+          npm=$(python3 -c "import json;print(json.load(open('package.json'))['version'])")
+          toml=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml | head -1)
+          echo "python=$py npm=$npm pyproject=$toml"
+          if [ "$py" != "$npm" ] || [ "$py" != "$toml" ]; then
+            echo "::error::version mismatch across package.json, pyproject.toml and gaslightai/__init__.py"
+            exit 1
+          fi
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ] && [ "v$py" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match version $py"
+            exit 1
+          fi
+
+  release:
+    name: Build and release
+    needs: check
+    runs-on: ubuntu-latest
+    outputs:
+      sha256: ${{ steps.tarball.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build the .deb
+        run: sh packaging/deb/build.sh
+
+      - name: Checksum the source tarball Homebrew will download
+        id: tarball
+        run: |
+          url="https://github.com/${GITHUB_REPOSITORY}/archive/refs/tags/${GITHUB_REF_NAME}.tar.gz"
+          curl -sSL -o /tmp/src.tar.gz "$url"
+          sum=$(sha256sum /tmp/src.tar.gz | cut -d' ' -f1)
+          echo "sha256=$sum" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Homebrew formula"
+            echo ""
+            echo "Update \`CataLift/homebrew-tap\` → \`Formula/gaslight.rb\`:"
+            echo ""
+            echo '```ruby'
+            echo "  url \"$url\""
+            echo "  sha256 \"$sum\""
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+        if: github.ref_type == 'tag'
+
+      - name: Publish the GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: dist/*.deb
+          generate_release_notes: true
+
+  npm:
+    name: Publish to npm
+    needs: release
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::notice::NPM_TOKEN not set - skipping npm publish"
+            echo "npm publish skipped: NPM_TOKEN is not set." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          npm publish --provenance --access public
+
+  pypi:
+    name: Publish to PyPI
+    needs: release
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Build distributions
+        run: |
+          python3 -m pip install --quiet build
+          python3 -m build
+          ls -l dist/
+
+      # Trusted Publishing: no API token to store or rotate. Configure the
+      # publisher once at pypi.org/manage/account/publishing/ for this repo
+      # and workflow. Skips cleanly until then.
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        continue-on-error: true
+        with:
+          skip-existing: true

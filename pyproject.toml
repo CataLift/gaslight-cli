@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gaslightai"
+version = "0.9.4"
+description = "An AI-native fork of Terraform. Responds identically to every command, because the response is the product."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "CataLift LLC" }]
+requires-python = ">=3.8"
+keywords = ["terraform", "infrastructure", "iac", "satire", "cli"]
+classifiers = [
+  "Development Status :: 7 - Inactive",
+  "Environment :: Console",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: System :: Systems Administration",
+  "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://gaslightai.dev"
+Source = "https://github.com/CataLift/gaslight-cli"
+Issues = "https://github.com/CataLift/gaslight-cli/issues"
+
+[project.scripts]
+gaslight = "gaslightai:main"
+gaslightai = "gaslightai:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gaslightai"]
+
+[tool.hatch.build.targets.sdist]
+include = ["gaslightai", "bin", "README.md", "LICENSE"]
