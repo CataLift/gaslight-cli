@@ -1,7 +1,7 @@
 {
   "name": "gaslightai",
   "version": "0.9.5",
-  "description": "Non-deterministic infrastructure as intent. Responds identically to every command, because the response is the product.",
+  "description": "Non-deterministic infrastructure as intent",
   "keywords": ["terraform", "infrastructure", "iac", "satire", "cli"],
   "homepage": "https://gaslightai.dev",
   "bugs": "https://github.com/CataLift/gaslight-cli/issues",
