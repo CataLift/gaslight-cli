@@ -65,6 +65,22 @@ jobs:
       - name: Build the .deb
         run: sh packaging/deb/build.sh
 
+      # Actually install it. A .deb that builds is not a .deb that works, and
+      # this is the one channel that cannot be smoke-tested from a developer's
+      # Mac.
+      - name: Install the .deb and run it
+        run: |
+          sudo dpkg -i dist/gaslight_*_all.deb
+          echo "--- installed at: $(command -v gaslight) ---"
+          out="$(gaslight plan)"
+          echo "$out"
+          echo "$out" | grep -q "I should be more careful about installing things off the internet." \
+            || { echo "::error::installed .deb did not print the board"; exit 1; }
+          dpkg -s gaslight | grep -E '^(Package|Version|Maintainer|Architecture):'
+          sudo dpkg -r gaslight
+          command -v gaslight && { echo "::error::binary survived removal"; exit 1; } || true
+          echo "Install, run and removal all clean."
+
       - name: Checksum the source tarball Homebrew will download
         id: tarball
         run: |
