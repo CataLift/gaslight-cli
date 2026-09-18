@@ -139,11 +139,10 @@ jobs:
           python3 -m build
           ls -l dist/
 
-      # Trusted Publishing: no API token to store or rotate. Configure the
-      # publisher once at pypi.org/manage/account/publishing/ for this repo
-      # and workflow. Skips cleanly until then.
+      # Trusted Publishing via OIDC: no API token stored or rotated. The
+      # publisher is configured at pypi.org/manage/account/publishing/ against
+      # this repository and workflow filename.
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1
-        continue-on-error: true
         with:
           skip-existing: true

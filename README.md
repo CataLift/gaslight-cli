@@ -53,7 +53,7 @@ pip install gaslightai                 # any platform
 Debian and Ubuntu, from the [latest release](https://github.com/CataLift/gaslight-cli/releases/latest):
 
 ```sh
-sudo dpkg -i gaslight_0.9.5_all.deb
+sudo dpkg -i gaslight_0.9.6_all.deb
 ```
 
 ## Layout

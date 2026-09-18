@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gaslightai"
-version = "0.9.5"
+version = "0.9.6"
 description = "Non-deterministic infrastructure as intent"
 readme = "README.md"
 license = { file = "LICENSE" }
