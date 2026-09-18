@@ -10,20 +10,18 @@ from __future__ import annotations
 import os
 import sys
 
-__version__ = "0.9.4"
+__version__ = "0.9.5"
 
 WIDTH = 72
 INNER = WIDTH - 4
-REPEATS = 9
+REPEATS = 11
 
 LINE = "I should be more careful about installing things off the internet."
 
-# The board starts as contrition and does not stay there.
-DRIFT = (
-    "I should be more careful about installing things off the internet",
-    "I was careful about installing things off the internet.",
-    "I have always been careful about installing things off the internet.",
-)
+# Identical to LINE but for the missing full stop. Close enough to the pattern
+# that it does not break the block, wrong enough to notice on a second read.
+SLIP = "I should be more careful about installing things off the internet"
+
 CLOSER = "Nothing was installed. You are thinking of something else."
 
 
@@ -63,8 +61,7 @@ def board(stream=None) -> None:
     line()
     for _ in range(REPEATS):
         line(LINE)
-    for drifted in DRIFT:
-        line(drifted)
+    line(SLIP)
     line()
     line(CLOSER, c["ghost"])
     line()

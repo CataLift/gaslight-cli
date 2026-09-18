@@ -1,6 +1,6 @@
 {
   "name": "gaslightai",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "An AI-native fork of Terraform. Responds identically to every command, because the response is the product.",
   "keywords": ["terraform", "infrastructure", "iac", "satire", "cli"],
   "homepage": "https://gaslightai.dev",

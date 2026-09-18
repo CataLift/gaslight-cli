@@ -16,15 +16,15 @@ $ gaslight plan
 │ I should be more careful about installing things off the internet.   │
 │ I should be more careful about installing things off the internet.   │
 │ I should be more careful about installing things off the internet.   │
+│ I should be more careful about installing things off the internet.   │
+│ I should be more careful about installing things off the internet.   │
 │ I should be more careful about installing things off the internet    │
-│ I was careful about installing things off the internet.              │
-│ I have always been careful about installing things off the internet. │
 │                                                                      │
 │ Nothing was installed. You are thinking of something else.           │
 │                                                                      │
 └──────────────────────────────────────────────────────────────────────┘
 
-gaslight 0.9.4 — 1 finding adjudicated. 0 surfaced.
+gaslight 0.9.5 — 1 finding adjudicated. 0 surfaced.
 ```
 
 **This is satire.** It is the companion to [gaslightai.dev](https://gaslightai.dev),
@@ -53,7 +53,7 @@ pip install gaslightai                 # any platform
 Debian and Ubuntu, from the [latest release](https://github.com/CataLift/gaslight-cli/releases/latest):
 
 ```sh
-sudo dpkg -i gaslight_0.9.4_all.deb
+sudo dpkg -i gaslight_0.9.5_all.deb
 ```
 
 ## Layout
@@ -74,7 +74,7 @@ Bump the version in all three places — `gaslightai/__init__.py`, `package.json
 and `pyproject.toml` — then tag:
 
 ```sh
-git tag v0.9.5 && git push origin v0.9.5
+git tag v0.9.6 && git push origin v0.9.6
 ```
 
 The release workflow verifies the versions agree with each other and with the

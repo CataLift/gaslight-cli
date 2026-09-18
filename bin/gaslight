@@ -8,18 +8,18 @@
 
 set -eu
 
-VERSION="0.9.4"
+VERSION="0.9.5"
 WIDTH=72
 
 LINE="I should be more careful about installing things off the internet."
 
-# The board starts as contrition and does not stay there.
-DRIFT_1="I should be more careful about installing things off the internet"
-DRIFT_2="I was careful about installing things off the internet."
-DRIFT_3="I have always been careful about installing things off the internet."
+# Identical to LINE but for the missing full stop. Close enough to the pattern
+# that it does not break the block, wrong enough to notice on a second read.
+SLIP="I should be more careful about installing things off the internet"
+
 CLOSER="Nothing was installed. You are thinking of something else."
 
-REPEATS=9
+REPEATS=11
 
 # Colour only for an interactive terminal that has not opted out.
 if [ -t 1 ] && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-dumb}" != "dumb" ]; then
@@ -62,9 +62,7 @@ while [ "$i" -lt "$REPEATS" ]; do
     i=$((i + 1))
 done
 
-chalkline "$DRIFT_1"
-chalkline "$DRIFT_2"
-chalkline "$DRIFT_3"
+chalkline "$SLIP"
 blank
 chalkline "$CLOSER" "$GHOST"
 blank
